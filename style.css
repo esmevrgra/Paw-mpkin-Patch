@@ -3,11 +3,24 @@
 #game-container {
   width: 600px;
   height: 200px;
-  border: 5px solid #8B4513;
-  background-color: #A0522D;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 5px solid #8B4513; 
+  background-color: #A0522D; 
+  position: relative; 
+  overflow: hidden; 
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  margin: 0;
+  /* Flexbox properties to center content */
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;    /* Centers vertically */
+  min-height: 100vh;      /* Ensures body takes up the full viewport height */
+  
+  background-color: #f0e0d0; 
+  font-family: sans-serif;
+  overflow: hidden; 
 }
 
 /* NEW: Styles for the Start Menu Overlay */
@@ -65,3 +78,13 @@
 
 
 /* ... (Existing #cat, #pumpkin, #score, and @keyframes styles remain the same) ... */
+
+@keyframes jump-effect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); } /* Cat gets slightly bigger/squishes for jump */
+  100% { transform: scale(1); }
+}
+
+#cat.is-jumping {
+  animation: jump-effect 0.1s ease-out; /* Briefly apply the animation */
+}
