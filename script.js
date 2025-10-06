@@ -23,6 +23,8 @@ let stageScoreCounter = 0; // Counter for current stage goal (5)
 
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
+const MAX_JUMP_HEIGHT_BOOST = 120; // This is the new, higher jump!
+
 
 // --- HIGH SCORE LOGIC ---
 function loadHighScore() {
@@ -158,8 +160,22 @@ function jump() {
     isJumping = true;
     let position = GROUND_HEIGHT; 
     
+    // 1. DETERMINE WHICH MAX JUMP HEIGHT TO USE
+    let maxJumpHeight;
+    
+    // Double and Triple pumpkins start at Stage 2. 
+    // We use the boost for Stage 2 (Double) and Stage 3 (Triple) and all subsequent stages.
+    if (currentStage >= 2) {
+        maxJumpHeight = MAX_JUMP_HEIGHT_BOOST;
+    } else {
+        // Use the normal jump for Singular Pumpkin (Stage 1)
+        maxJumpHeight = MAX_JUMP_HEIGHT; // Using the original 90px height
+    }
+    
+    // 2. EXECUTE THE JUMP
     let upInterval = setInterval(() => {
-        if (position >= (GROUND_HEIGHT + MAX_JUMP_HEIGHT)) {
+        // Use the selected maxJumpHeight here
+        if (position >= (GROUND_HEIGHT + maxJumpHeight)) { 
             clearInterval(upInterval);
             
             let downInterval = setInterval(() => {

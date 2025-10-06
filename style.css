@@ -141,20 +141,17 @@ body {
 .obstacle.double-pumpkin {
   width: 60px;
   height: 80px; 
-  background-image: url('images/FTwo_Pumpkins.png');
 
 }
 
 .obstacle.triple-pumpkin {
   width: 60px;
   height: 135px;
-  background-image: url('images/FThree_Pumpkins.png');
 }
 
 .obstacle.ghost {
   width: 64px;
   height: 64px;
-  background-image: url('images/FGhost.png');
 }
 @keyframes obstacleMove {
     from {
