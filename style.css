@@ -1,23 +1,20 @@
 #game-container {
-  /* RESPONSIVE DESIGN (CRITICAL FOR MOBILE) */
   max-width: 600px; 
   width: 90vw;      
-  height: 30vw;     /* Maintains the 3:1 aspect ratio */
+  height: 30vw;    
   max-height: 200px; 
   border: 5px solid #8B4513; 
   margin: 20px auto; 
   
-  /* BACKGROUND STYLES */
-  background-image: url('images/MoonBackground.png'); /* Verify file name is correct! */
+  background-image: url('images/MoonBackground.png');
   background-size: cover;                       
   background-repeat: no-repeat;
   background-position: center bottom;            
 
-  /* POSITIONING/VISUALS */
   position: relative; 
   overflow: hidden; 
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
-  z-index: 1; /* Ensure it's above the body */
+  z-index: 1; 
 }
 
 body {

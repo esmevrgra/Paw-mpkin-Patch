@@ -116,18 +116,18 @@ function spawnLoop() {
         let obstacleCreator;
         
         switch (currentStage) {
-            case 1: // Singular Pumpkin
-                obstacleCreator = createSingularPumpkin;
+            case 1:
+            obstacleCreator = createSingularPumpkin;
                 break;
-            case 2: // Double Pumpkin
-                obstacleCreator = createDoublePumpkin;
+            case 2: 
+            obstacleCreator = createGhost;
                 break;
-            case 3: // Triple Pumpkin
-                obstacleCreator = createTriplePumpkin;
+            case 3: 
+                obstacleCreator =createDoublePumpkin;
                 break;
-            case 4: // FORCE GHOST ONLY
-                obstacleCreator = createGhost;
-                break;
+            case 4:
+            obstacleCreator = createTriplePumpkin;
+            break;
             case 5: // Sequential Mix (Ghost after every 2 pumpkins)
             default:
                 // Check if we've spawned 2 pumpkins already (randomMixSequence will be 2)
