@@ -54,6 +54,10 @@ body {
   font-size: 1.2em;
 }
 
+#start-menu, #score {
+  font-family: 'Pixelify Sans', sans-serif;
+}
+
 #start-button {
   padding: 10px 20px;
   font-size: 1.2em;
@@ -85,6 +89,77 @@ body {
   100% { transform: scale(1); }
 }
 
+/* --- Cat Styling Update --- */
+#cat {
+  /* Dimensions based on your pixel art. Adjust to fit your image scale. */
+  width: 64px;  /* Example: If the original pixel art is 32x32, 64px is a 2x scale */
+  height: 64px; 
+  position: absolute;
+  bottom: 10px; /* Aligned to the ground layer (10px up) */
+  left: 20px;
+  
+  /* Initially set to the first frame */
+  background-image: url('images/FCat1.png'); /* **UPDATE THIS PATH!** */
+  background-size: cover;
+  background-color: transparent; /* Remove the old orange background */
+  
+  border-radius: 0; /* No need for rounded corners */
+}
+
+/* --- Pumpkin Styling Update --- */
+#pumpkin {
+  /* Dimensions based on your pumpkin image. Adjust to fit your image scale. */
+  width: 60px; 
+  height: 45px;
+  position: absolute;
+  bottom: 10px; /* Aligned to the ground layer (10px up) */
+  right: 0; 
+  
+  background-image: url('images/FSingular_Pumpkinn.png'); /* **UPDATE THIS PATH!** */
+  background-size: contain; /* Ensure the full pumpkin is visible */
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-color: transparent; /* Remove the old orange background */
+  border-radius: 0;
+}
+
+/* --- Running Animation Class --- */
+/* This class will be added/removed by JavaScript */
+.running-frame-1 {
+  background-image: url('images/FCat1.png');
+}
+.running-frame-2 {
+  background-image: url('images/FCat2.png');
+}
+
 #cat.is-jumping {
   animation: jump-effect 0.1s ease-out; /* Briefly apply the animation */
+}
+
+/* --- NEW: Style for ALL Dynamic Obstacles --- */
+.obstacle {
+    width: 60px; /* Match the size used in JS */
+    height: 45px; /* Match the size used in JS */
+    position: absolute;
+    bottom: 10px; /* Aligned to the ground level */
+    right: 0; 
+    
+    background-image: url('images/FSingular_Pumpkinn.png'); 
+    background-size: contain; 
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-color: transparent; 
+}
+
+/* Remove the old #pumpkin selector and its styles */
+/* The @keyframes moveGround remains the same as it gives the illusion of speed */
+
+/* Make sure your @keyframes obstacleMove also remains the same: */
+@keyframes obstacleMove {
+    from {
+        right: -60px; /* Start just off-screen (width of the pumpkin) */
+    }
+    to {
+        right: 100%; /* Move across the screen */
+    }
 }
