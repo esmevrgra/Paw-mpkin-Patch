@@ -1,4 +1,3 @@
-
 const cat = document.getElementById('cat');
 const scoreDisplay = document.getElementById('score');
 const startMenu = document.getElementById('start-menu');
@@ -16,6 +15,7 @@ let gameLoopInterval;
 let catAnimationInterval;
 let obstacleSpawnInterval;
 let frameToggle = true;
+let randomMixSequence = 0; 
 
 let highScore = 0;
 let currentStage = 1;      // Stage 1 = Singular Pumpkins
@@ -23,7 +23,8 @@ let stageScoreCounter = 0; // Counter for current stage goal (5)
 
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
-const MAX_JUMP_HEIGHT_BOOST = 120; // This is the new, higher jump!
+// CRITICAL FIX: INCREASED to 130 to safely clear the Ghost's 124px height.
+const MAX_JUMP_HEIGHT_BOOST = 130; 
 
 
 // --- HIGH SCORE LOGIC ---
@@ -106,15 +107,12 @@ function createGhost() {
     createObstacle('ghost', 64, GHOST_HEIGHT, GHOST_BOTTOM, 'FGhost.png');
 }
 
-// --- SPAWN LOOP (SIMPLIFIED) ---
+// --- SPAWN LOOP (FIXED GHOST SEQUENCE) ---
 function spawnLoop() {
     const randomTime = Math.random() * (2500 - 1200) + 1200;
     
     obstacleSpawnInterval = setTimeout(() => {
         
-        // Stage check is no longer needed here, as it's handled in createObstacle's scoring.
-        
-        // Determine which obstacle to spawn
         let obstacleCreator;
         
         switch (currentStage) {
@@ -127,18 +125,22 @@ function spawnLoop() {
             case 3: // Triple Pumpkin
                 obstacleCreator = createTriplePumpkin;
                 break;
-            case 4: // Ghost
+            case 4: // FORCE GHOST ONLY
                 obstacleCreator = createGhost;
                 break;
-            case 5: // Random Mix
+            case 5: // Sequential Mix (Ghost after every 2 pumpkins)
             default:
-                const creators = [
-                    createSingularPumpkin, 
-                    createDoublePumpkin, 
-                    createTriplePumpkin, 
-                    createGhost
-                ];
-                obstacleCreator = creators[Math.floor(Math.random() * creators.length)];
+                // Check if we've spawned 2 pumpkins already (randomMixSequence will be 2)
+                if (randomMixSequence >= 2) {
+                    // 1. Ghost spawns on the 3rd turn
+                    obstacleCreator = createGhost;
+                    randomMixSequence = 0; // Reset counter
+                } else {
+                    // 2. Random Pumpkin spawns on the 1st and 2nd turns
+                    const creators = [createSingularPumpkin, createDoublePumpkin, createTriplePumpkin];
+                    obstacleCreator = creators[Math.floor(Math.random() * creators.length)];
+                    randomMixSequence++; // Increment counter (to 1 or 2)
+                }
                 break;
         }
 
@@ -164,12 +166,12 @@ function jump() {
     let maxJumpHeight;
     
     // Double and Triple pumpkins start at Stage 2. 
-    // We use the boost for Stage 2 (Double) and Stage 3 (Triple) and all subsequent stages.
     if (currentStage >= 2) {
-        maxJumpHeight = MAX_JUMP_HEIGHT_BOOST;
+        // Use the new, higher jump determined by the MAX_JUMP_HEIGHT_BOOST constant
+        maxJumpHeight = MAX_JUMP_HEIGHT_BOOST; 
     } else {
         // Use the normal jump for Singular Pumpkin (Stage 1)
-        maxJumpHeight = MAX_JUMP_HEIGHT; // Using the original 90px height
+        maxJumpHeight = MAX_JUMP_HEIGHT; 
     }
     
     // 2. EXECUTE THE JUMP
@@ -196,15 +198,16 @@ function jump() {
 }
 
 
-// --- COLLISION CHECK LOGIC (ADJUSTED SENSITIVITY) ---
+// --- COLLISION CHECK LOGIC (FINAL SENSITIVITY FIX) ---
 function checkCollision() {
     if (isGameOver) return;
     
     const fullCatRect = cat.getBoundingClientRect();
     const obstacles = document.querySelectorAll('.obstacle');
     
+    // REDUCED CAT HITBOX VERTICALLY AND HORIZONTALLY
     const SHRINK_HORIZONTAL = 10;
-    const SHRINK_VERTICAL_TOP = 15;
+    const SHRINK_VERTICAL_TOP = 30; // Increased shrink for vertical safety (was 15)
     const SHRINK_VERTICAL_BOTTOM = 5;
 
     const catHitbox = {
@@ -217,19 +220,28 @@ function checkCollision() {
     obstacles.forEach(pumpkin => {
         let pumpkinRect = pumpkin.getBoundingClientRect();
         
-        // **NEW: Targeted Hitbox Adjustment for Double/Triple Pumpkins**
+        // TARGETED SHRINK: Adjust the tall pumpkins hitbox
         if (pumpkin.classList.contains('double-pumpkin') || pumpkin.classList.contains('triple-pumpkin')) {
-            // By adding 10px to the 'top' boundary, we are making the effective collision 
-            // box shorter by 10 pixels, giving the cat extra vertical clearance.
+            // Reduces the effective collision height by 15 pixels for tall pumpkins only.
             pumpkinRect = {
                 left: pumpkinRect.left,
                 right: pumpkinRect.right,
-                top: pumpkinRect.top + 10, // Pushes the collision top down by 10px
+                top: pumpkinRect.top + 15, // Pushes the collision top down by 15px (was 10)
+                bottom: pumpkinRect.bottom
+            };
+        } 
+        // TARGETED SHRINK: Adjust the Ghost's hitbox for better clearance (optional)
+        else if (pumpkin.classList.contains('ghost')) {
+            // Shrink horizontally to make passing underneath easier
+            pumpkinRect = {
+                left: pumpkinRect.left + 5,
+                right: pumpkinRect.right - 5,
+                top: pumpkinRect.top, 
                 bottom: pumpkinRect.bottom
             };
         }
         
-        // --- Standard Collision Check ---
+        // --- Final Collision Check ---
         if (
             catHitbox.left < pumpkinRect.right && 
             catHitbox.right > pumpkinRect.left && 
@@ -275,6 +287,7 @@ function resetGame() {
     score = 0;
     stageScoreCounter = 0; 
     currentStage = 1;      
+    randomMixSequence = 0; // Reset sequence tracker
     scoreDisplay.textContent = 'Score: 0';
     isGameOver = true; 
     isJumping = false;

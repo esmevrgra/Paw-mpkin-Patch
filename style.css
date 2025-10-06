@@ -1,12 +1,23 @@
-
 #game-container {
-  width: 600px;
-  height: 200px;
+  /* RESPONSIVE DESIGN (CRITICAL FOR MOBILE) */
+  max-width: 600px; 
+  width: 90vw;      
+  height: 30vw;     /* Maintains the 3:1 aspect ratio */
+  max-height: 200px; 
   border: 5px solid #8B4513; 
-  background-color: #A0522D; 
+  margin: 20px auto; 
+  
+  /* BACKGROUND STYLES */
+  background-image: url('images/MoonBackground.png'); /* Verify file name is correct! */
+  background-size: cover;                       
+  background-repeat: no-repeat;
+  background-position: center bottom;            
+
+  /* POSITIONING/VISUALS */
   position: relative; 
   overflow: hidden; 
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  z-index: 1; /* Ensure it's above the body */
 }
 
 body {
@@ -27,7 +38,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  background-color: rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -39,14 +50,14 @@ body {
 }
 
 #start-menu h1 {
-  color: #ff4500; /* Orange title color */
+  color: #ff4500;
   margin-bottom: 5px;
   font-size: 2.5em;
   text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
 }
 
 #start-menu p {
-  color: #8B4513; /* Brown subtitle color */
+  color: #8B4513;
   margin-top: 0;
   font-size: 1.2em;
 }
@@ -123,10 +134,8 @@ body {
   animation: jump-effect 0.1s ease-out; 
 }
 
-/* Update the generic .obstacle class in style.css */
 .obstacle {
   width: 60px; 
-  height: 45px;
   position: absolute;
   bottom: 10px; 
   right: 0; 
@@ -140,27 +149,23 @@ body {
 
 .obstacle.double-pumpkin {
   width: 60px;
-  /* REDUCED from 90px to 80px: Gives 10px more vertical clearance */
-  height: 5px; 
 }
 
 .obstacle.triple-pumpkin {
   width: 60px;
-  /* REDUCED from 135px to 120px: Gives 15px more vertical clearance */
-  height: 5px;
 }
-/* You can adjust these numbers more if needed. */
 
 .obstacle.ghost {
   width: 64px;
   height: 64px;
 }
+
 @keyframes obstacleMove {
     from {
-        right: -60px; /* Start just off-screen (width of the pumpkin) */
+        right: -60px;
     }
     to {
-        right: 100%; /* Move across the screen */
+        right: 100%;
     }
 }
 
@@ -188,6 +193,12 @@ body {
   color: #FF4500; 
   margin-bottom: 5px;
   font-size: 3.5em;
+  display: none;
+  
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  z-index: 10; 
   text-shadow: 3px 3px 5px rgba(255, 255, 255, 0.5);
 }
 
@@ -200,6 +211,8 @@ body {
   font-size: 2.5em;
   font-weight: bold;
   color: #ff9900; 
+  margin-bottom: 0.5px;
+
 }
 
 #high-score {
@@ -211,7 +224,7 @@ body {
 }
 
 #play-again-button {
-  padding: 10px 20px;
+  padding: 5px 20px;
   font-size: 1.2em;
   font-weight: bold;
   color: #8B4513;
@@ -219,8 +232,11 @@ body {
   border: 3px solid #ff9900;
   border-radius: 8px;
   cursor: pointer;
+  display: block; 
+  
+  margin-top: 5px; 
+  
   transition: background-color 0.2s;
-  margin-top: 20px;
   font-family: 'PawPatchPixel', monospace;
 }
 
@@ -228,4 +244,3 @@ body {
   background-color: #ff9900;
   color: white;
 }
-
