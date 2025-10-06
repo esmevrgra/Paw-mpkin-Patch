@@ -215,8 +215,21 @@ function checkCollision() {
     };
     
     obstacles.forEach(pumpkin => {
-        const pumpkinRect = pumpkin.getBoundingClientRect();
+        let pumpkinRect = pumpkin.getBoundingClientRect();
         
+        // **NEW: Targeted Hitbox Adjustment for Double/Triple Pumpkins**
+        if (pumpkin.classList.contains('double-pumpkin') || pumpkin.classList.contains('triple-pumpkin')) {
+            // By adding 10px to the 'top' boundary, we are making the effective collision 
+            // box shorter by 10 pixels, giving the cat extra vertical clearance.
+            pumpkinRect = {
+                left: pumpkinRect.left,
+                right: pumpkinRect.right,
+                top: pumpkinRect.top + 10, // Pushes the collision top down by 10px
+                bottom: pumpkinRect.bottom
+            };
+        }
+        
+        // --- Standard Collision Check ---
         if (
             catHitbox.left < pumpkinRect.right && 
             catHitbox.right > pumpkinRect.left && 

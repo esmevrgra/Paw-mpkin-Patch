@@ -140,14 +140,16 @@ body {
 
 .obstacle.double-pumpkin {
   width: 60px;
-  height: 80px; 
-
+  /* REDUCED from 90px to 80px: Gives 10px more vertical clearance */
+  height: 5px; 
 }
 
 .obstacle.triple-pumpkin {
   width: 60px;
-  height: 135px;
+  /* REDUCED from 135px to 120px: Gives 15px more vertical clearance */
+  height: 5px;
 }
+/* You can adjust these numbers more if needed. */
 
 .obstacle.ghost {
   width: 64px;
