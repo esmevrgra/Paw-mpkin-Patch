@@ -183,6 +183,14 @@ body {
   color: #ff9900; 
 }
 
+#high-score {
+  color: #ffd700; 
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.5em; 
+  margin-top: 10px; 
+  margin-bottom: 20px;
+}
+
 #play-again-button {
   padding: 10px 20px;
   font-size: 1.2em;

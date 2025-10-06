@@ -7,6 +7,7 @@ const gameContainer = document.getElementById('game-container');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreDisplay = document.getElementById('final-score');
 const playAgainButton = document.getElementById('play-again-button');
+const highScoreDisplay = document.getElementById('high-score');
 
 let isJumping = false;
 let score = 0;
@@ -16,9 +17,20 @@ let catAnimationInterval;
 let obstacleSpawnInterval;
 let frameToggle = true;
 
+let highScore = 0;
+
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
 
+// --- HIGH SCORE LOGIC ---
+function loadHighScore() {
+    const storedHighScore = localStorage.getItem('pawmpkinHighScore');
+    if (storedHighScore) {
+        highScore = parseInt(storedHighScore);
+    }
+    // Update the element's content so it is ready when the game over screen is shown
+    highScoreDisplay.textContent = `High Score: ${highScore}`;
+}
 
 // --- CAT RUNNING ANIMATION LOGIC ---
 function animateCatRun() {
@@ -32,7 +44,7 @@ function animateCatRun() {
     }
 }
 
-// --- DYNAMIC OBSTACLE SPAWNING LOGIC ---
+// --- DYNAMIC OBSTACLE SPAWNING & SCORING LOGIC ---
 function createPumpkin() {
     const newPumpkin = document.createElement('div');
     newPumpkin.classList.add('obstacle'); 
@@ -43,7 +55,6 @@ function createPumpkin() {
     gameContainer.appendChild(newPumpkin);
 
     setTimeout(() => {
-        // Only update score if the game is NOT over
         if (!isGameOver) { 
             score++;
             scoreDisplay.textContent = `Score: ${score}`;
@@ -96,18 +107,19 @@ function jump() {
 }
 
 
-// --- COLLISION & SCORE CHECK LOGIC ---
+// --- COLLISION CHECK LOGIC (ADJUSTED SENSITIVITY) ---
 function checkCollision() {
     if (isGameOver) return;
     
     const fullCatRect = cat.getBoundingClientRect();
-    const gameContainerRect = gameContainer.getBoundingClientRect();
     const obstacles = document.querySelectorAll('.obstacle');
     
-    const SHRINK_HORIZONTAL = 10; 
-    const SHRINK_VERTICAL_TOP = 15; 
-    const SHRINK_VERTICAL_BOTTOM = 5; 
+    // Hitbox adjustment values (in pixels)
+    const SHRINK_HORIZONTAL = 10;
+    const SHRINK_VERTICAL_TOP = 15;
+    const SHRINK_VERTICAL_BOTTOM = 5;
 
+    // Create a NEW, smaller, virtual hitbox for the cat
     const catHitbox = {
         left: fullCatRect.left + SHRINK_HORIZONTAL,
         right: fullCatRect.right - SHRINK_HORIZONTAL,
@@ -132,7 +144,7 @@ function checkCollision() {
 }
 
 
-// --- GAME OVER LOGIC ---
+// --- GAME OVER LOGIC (FINAL) ---
 function gameOver() {
     isGameOver = true;
     
@@ -143,12 +155,22 @@ function gameOver() {
     document.querySelectorAll('.obstacle').forEach(obstacle => {
         obstacle.style.animationPlayState = 'paused';
     });
+
+    // High Score Check and Save
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('pawmpkinHighScore', highScore);
+    }
     
+    // Always update high score element content
+    highScoreDisplay.textContent = `High Score: ${highScore}`;
     finalScoreDisplay.textContent = score; 
+    
+    // Show Game Over screen (which contains the high score element)
     gameOverScreen.style.display = 'flex'; 
 }
 
-// --- GAME RESET LOGIC ---
+// --- GAME RESET LOGIC (FINAL) ---
 function resetGame() {
     document.querySelectorAll('.obstacle').forEach(obstacle => {
         obstacle.remove();
@@ -160,9 +182,13 @@ function resetGame() {
     isJumping = false;
     cat.style.bottom = `${GROUND_HEIGHT}px`; 
     
+    // Hide game over screen
     gameOverScreen.style.display = 'none';
     
     startMenu.style.display = 'flex'; 
+    
+    // Reload high score data (updates variable and element content)
+    loadHighScore(); 
 }
 
 
@@ -170,13 +196,12 @@ function resetGame() {
 function startGame() {
     isGameOver = false;
 
-    // Hides the start menu when playing
     startMenu.style.display = 'none';
     
     cat.style.visibility = 'visible';
     scoreDisplay.style.visibility = 'visible';
+    // Removed visibility control for high score element
 
-    // Focus for spacebar input
     gameContainer.focus();
 
     catAnimationInterval = setInterval(animateCatRun, 100); 
@@ -187,7 +212,6 @@ function startGame() {
 
 
 // --- EVENT LISTENERS ---
-
 startButton.addEventListener('click', startGame);
 
 playAgainButton.addEventListener('click', () => {
@@ -195,7 +219,6 @@ playAgainButton.addEventListener('click', () => {
     startGame();
 });
 
-// Jump listeners
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' && !isGameOver) {
         jump();
@@ -210,5 +233,6 @@ gameContainer.addEventListener('click', () => {
 
 
 // --- INITIALIZATION ---
-// Ensure the cat starts at the correct ground level immediately on load
 cat.style.bottom = `${GROUND_HEIGHT}px`;
+loadHighScore();
+// Removed visibility control for high score element
