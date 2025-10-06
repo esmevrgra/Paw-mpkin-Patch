@@ -18,6 +18,8 @@ let obstacleSpawnInterval;
 let frameToggle = true;
 
 let highScore = 0;
+let currentStage = 1;      // Stage 1 = Singular Pumpkins
+let stageScoreCounter = 0; // Counter for current stage goal (5)
 
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
@@ -28,7 +30,6 @@ function loadHighScore() {
     if (storedHighScore) {
         highScore = parseInt(storedHighScore);
     }
-    // Update the element's content so it is ready when the game over screen is shown
     highScoreDisplay.textContent = `High Score: ${highScore}`;
 }
 
@@ -44,31 +45,103 @@ function animateCatRun() {
     }
 }
 
-// --- DYNAMIC OBSTACLE SPAWNING & SCORING LOGIC ---
-function createPumpkin() {
-    const newPumpkin = document.createElement('div');
-    newPumpkin.classList.add('obstacle'); 
-    
-    newPumpkin.style.bottom = `${GROUND_HEIGHT}px`; 
-    newPumpkin.style.animation = 'obstacleMove 2s linear'; 
-    
-    gameContainer.appendChild(newPumpkin);
+// --- DYNAMIC OBSTACLE CREATION & SCORING LOGIC ---
 
+// Generic function to create an obstacle with specific properties
+function createObstacle(className, width, height, bottom, imageURL) {
+    const newObstacle = document.createElement('div');
+    newObstacle.classList.add('obstacle', className); 
+    
+    newObstacle.style.width = `${width}px`;
+    newObstacle.style.height = `${height}px`;
+    newObstacle.style.bottom = `${bottom}px`; 
+    newObstacle.style.backgroundImage = `url('images/${imageURL}')`;
+    newObstacle.style.animation = 'obstacleMove 2s linear'; 
+    
+    gameContainer.appendChild(newObstacle);
+
+    // Scoring and Removal Logic (FIXED: Stage check moved here for accuracy)
     setTimeout(() => {
         if (!isGameOver) { 
             score++;
+            stageScoreCounter++; // Increment stage counter
             scoreDisplay.textContent = `Score: ${score}`;
+
+            // Check for stage advancement immediately after scoring
+            if (stageScoreCounter >= 5) {
+                currentStage++;
+                stageScoreCounter = 0;
+                // Limit stages to 5 (4 main stages + 1 randomized stage)
+                if (currentStage > 5) {
+                    currentStage = 5; 
+                }
+            }
         }
-        newPumpkin.remove();
+        newObstacle.remove();
     }, 2000); 
 }
 
-// Recursive function to continuously spawn pumpkins at random intervals
+// Stage 1: Singular Pumpkin
+function createSingularPumpkin() {
+    createObstacle('pumpkin', 60, 45, GROUND_HEIGHT, 'FSingular_Pumpkinn.png');
+}
+
+// Stage 2: Double Pumpkin
+function createDoublePumpkin() {
+    createObstacle('double-pumpkin', 60, 90, GROUND_HEIGHT, 'FTwo_Pumpkins.png');
+}
+
+// Stage 3: Triple Pumpkin
+function createTriplePumpkin() {
+    createObstacle('triple-pumpkin', 60, 135, GROUND_HEIGHT, 'FThree_Pumpkins.png');
+}
+
+// Stage 4: Ghost (floats high)
+function createGhost() {
+    const GHOST_HEIGHT = 64;
+    const GHOST_BOTTOM = 60; // Floats 60px above ground
+    
+    createObstacle('ghost', 64, GHOST_HEIGHT, GHOST_BOTTOM, 'FGhost.png');
+}
+
+// --- SPAWN LOOP (SIMPLIFIED) ---
 function spawnLoop() {
     const randomTime = Math.random() * (2500 - 1200) + 1200;
     
     obstacleSpawnInterval = setTimeout(() => {
-        createPumpkin();
+        
+        // Stage check is no longer needed here, as it's handled in createObstacle's scoring.
+        
+        // Determine which obstacle to spawn
+        let obstacleCreator;
+        
+        switch (currentStage) {
+            case 1: // Singular Pumpkin
+                obstacleCreator = createSingularPumpkin;
+                break;
+            case 2: // Double Pumpkin
+                obstacleCreator = createDoublePumpkin;
+                break;
+            case 3: // Triple Pumpkin
+                obstacleCreator = createTriplePumpkin;
+                break;
+            case 4: // Ghost
+                obstacleCreator = createGhost;
+                break;
+            case 5: // Random Mix
+            default:
+                const creators = [
+                    createSingularPumpkin, 
+                    createDoublePumpkin, 
+                    createTriplePumpkin, 
+                    createGhost
+                ];
+                obstacleCreator = creators[Math.floor(Math.random() * creators.length)];
+                break;
+        }
+
+        obstacleCreator();
+        
         if (!isGameOver) {
             spawnLoop();
         }
@@ -114,12 +187,10 @@ function checkCollision() {
     const fullCatRect = cat.getBoundingClientRect();
     const obstacles = document.querySelectorAll('.obstacle');
     
-    // Hitbox adjustment values (in pixels)
     const SHRINK_HORIZONTAL = 10;
     const SHRINK_VERTICAL_TOP = 15;
     const SHRINK_VERTICAL_BOTTOM = 5;
 
-    // Create a NEW, smaller, virtual hitbox for the cat
     const catHitbox = {
         left: fullCatRect.left + SHRINK_HORIZONTAL,
         right: fullCatRect.right - SHRINK_HORIZONTAL,
@@ -130,7 +201,6 @@ function checkCollision() {
     obstacles.forEach(pumpkin => {
         const pumpkinRect = pumpkin.getBoundingClientRect();
         
-        // --- COLLISION CHECK (Game Over) ---
         if (
             catHitbox.left < pumpkinRect.right && 
             catHitbox.right > pumpkinRect.left && 
@@ -144,7 +214,7 @@ function checkCollision() {
 }
 
 
-// --- GAME OVER LOGIC (FINAL) ---
+// --- GAME OVER LOGIC ---
 function gameOver() {
     isGameOver = true;
     
@@ -156,38 +226,34 @@ function gameOver() {
         obstacle.style.animationPlayState = 'paused';
     });
 
-    // High Score Check and Save
     if (score > highScore) {
         highScore = score;
         localStorage.setItem('pawmpkinHighScore', highScore);
     }
     
-    // Always update high score element content
     highScoreDisplay.textContent = `High Score: ${highScore}`;
     finalScoreDisplay.textContent = score; 
     
-    // Show Game Over screen (which contains the high score element)
     gameOverScreen.style.display = 'flex'; 
 }
 
-// --- GAME RESET LOGIC (FINAL) ---
+// --- GAME RESET LOGIC ---
 function resetGame() {
     document.querySelectorAll('.obstacle').forEach(obstacle => {
         obstacle.remove();
     });
     
     score = 0;
+    stageScoreCounter = 0; 
+    currentStage = 1;      
     scoreDisplay.textContent = 'Score: 0';
     isGameOver = true; 
     isJumping = false;
     cat.style.bottom = `${GROUND_HEIGHT}px`; 
     
-    // Hide game over screen
     gameOverScreen.style.display = 'none';
-    
     startMenu.style.display = 'flex'; 
     
-    // Reload high score data (updates variable and element content)
     loadHighScore(); 
 }
 
@@ -200,7 +266,6 @@ function startGame() {
     
     cat.style.visibility = 'visible';
     scoreDisplay.style.visibility = 'visible';
-    // Removed visibility control for high score element
 
     gameContainer.focus();
 
@@ -235,4 +300,3 @@ gameContainer.addEventListener('click', () => {
 // --- INITIALIZATION ---
 cat.style.bottom = `${GROUND_HEIGHT}px`;
 loadHighScore();
-// Removed visibility control for high score element

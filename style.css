@@ -104,6 +104,7 @@ body {
   right: 0; 
   
   background-image: url('images/FSingular_Pumpkinn.png'); 
+
   background-size: contain; 
   background-repeat: no-repeat;
   background-position: bottom;
@@ -122,20 +123,39 @@ body {
   animation: jump-effect 0.1s ease-out; 
 }
 
+/* Update the generic .obstacle class in style.css */
 .obstacle {
-    width: 60px; 
-    height: 45px;
-    position: absolute;
-    bottom: 10px; 
-    right: 0; 
-    
-    background-image: url('images/FSingular_Pumpkinn.png'); 
-    background-size: contain; 
-    background-repeat: no-repeat;
-    background-position: bottom;
-    background-color: transparent; 
+  width: 60px; 
+  height: 45px;
+  position: absolute;
+  bottom: 10px; 
+  right: 0; 
+  
+  background-size: contain; 
+  background-repeat: no-repeat;
+  background-position: bottom;
+  
+  background-color: transparent; 
 }
 
+.obstacle.double-pumpkin {
+  width: 60px;
+  height: 80px; 
+  background-image: url('images/FTwo_Pumpkins.png');
+
+}
+
+.obstacle.triple-pumpkin {
+  width: 60px;
+  height: 135px;
+  background-image: url('images/FThree_Pumpkins.png');
+}
+
+.obstacle.ghost {
+  width: 64px;
+  height: 64px;
+  background-image: url('images/FGhost.png');
+}
 @keyframes obstacleMove {
     from {
         right: -60px; /* Start just off-screen (width of the pumpkin) */
