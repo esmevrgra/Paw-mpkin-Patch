@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="game-container">
+    <div id="game-container" tabindex="0">
         
       <div id="start-menu">
         <h1>🐾 Paw-mpkin Patch 🎃</h1>
@@ -16,16 +16,21 @@
         
         <div id="instructions">
         </div>
-
-        <button id="start-button">Play!</button>
-    </div>
-
-        <div id="cat"></div>
-        <div id="pumpkin"></div>
-
-      
-        <div id="score">Score: 0</div>
         
+        <button id="start-button">Play!</button>
+      </div>
+
+      <div id="game-over-screen">
+          <h1>GAME OVER</h1>
+          <p>Your final score:</p>
+          <p id="final-score">0</p>
+          <button id="play-again-button">Play Again?</button>
+      </div>
+      
+      <div id="ground"></div> 
+      <div id="cat"></div>
+      <div id="score">Score: 0</div>
+
     </div>
 
     <script src="script.js"></script>
