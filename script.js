@@ -16,6 +16,11 @@ let catAnimationInterval;
 let obstacleSpawnInterval;
 let frameToggle = true;
 let randomMixSequence = 0; 
+//machine learning (attempt)
+let detector;
+let videoElement;
+const VIDEO_WIDTH = 640;
+const VIDEO_HEIGHT = 480;
 
 let highScore = 0;
 let currentStage = 1;      // Stage 1 = Singular Pumpkins
@@ -25,6 +30,71 @@ const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
 // CRITICAL FIX: INCREASED to 130 to safely clear the Ghost's 124px height.
 const MAX_JUMP_HEIGHT_BOOST = 130; 
+
+
+//machine learning(attempt)
+async function setupWebcamAndML() {
+    // 1. Setup Video Element (hidden or background)
+    videoElement = document.createElement('video');
+    videoElement.width = VIDEO_WIDTH;
+    videoElement.height = VIDEO_HEIGHT;
+    videoElement.autoplay = true;
+    videoElement.style.display = 'none'; // Keep the video stream hidden
+
+    // 2. Load the Hand Pose Detection Model
+    const model = handPoseDetection.SupportedModels.MediaPipeHands;
+    const detectorConfig = {
+        runtime: 'mediapipe', // Use the optimized Mediapipe backend
+        modelType: 'full'
+    };
+    detector = await handPoseDetection.createDetector(model, detectorConfig);
+
+    // 3. Start Webcam Stream
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
+    await new Promise((resolve) => {
+        videoElement.onloadedmetadata = resolve;
+    });
+
+    // 4. Start the detection loop
+    detectHandsLoop();
+}
+
+//machine learning (attempt)
+// --- MACHINE LEARNING HAND DETECTION LOOP (NEW CODE) ---
+async function detectHandsLoop() {
+    // Stop the detection loop if the game is over
+    if (isGameOver) {
+        return;
+    }
+    
+    // Check if the detector has been loaded
+    if (detector) {
+        // 1. Detect hands in the current video frame
+        // Use the video element to feed the frame to the model
+        const hands = await detector.estimateHands(videoElement, { flipHorizontal: false });
+
+        if (hands.length > 0) {
+            // Find the tip of the index finger (this is landmark keypoint index 8)
+            const indexTip = hands[0].keypoints.find(kp => kp.name === 'index_finger_tip');
+
+            if (indexTip) {
+                // 2. Define the Z-axis threshold for triggering a jump. 
+                // A negative Z-value means the finger is closer to the camera.
+                const Z_THRESHOLD = -20; // Adjust this value for sensitivity 
+                
+                // 3. Trigger the jump if the finger is "pushed" toward the camera (Z-axis condition)
+                if (indexTip.z < Z_THRESHOLD && !isJumping) {
+                    // Call your existing jump function
+                    jump(); 
+                }
+            }
+        }
+    }
+
+    // Loop the detection process for the next video frame
+    requestAnimationFrame(detectHandsLoop);
+}
 
 
 // --- HIGH SCORE LOGIC ---
@@ -302,21 +372,23 @@ function resetGame() {
 
 // --- START GAME LOGIC ---
 function startGame() {
-    isGameOver = false;
+    isGameOver = false; // Set this first
 
     startMenu.style.display = 'none';
     
     cat.style.visibility = 'visible';
     scoreDisplay.style.visibility = 'visible';
 
-    gameContainer.focus();
+    // NEW: Start the webcam and ML model when the game starts
+    setupWebcamAndML(); 
+
+    gameContainer.focus(); // Focus for keyboard input (if kept)
 
     catAnimationInterval = setInterval(animateCatRun, 100); 
     spawnLoop();
     
     gameLoopInterval = setInterval(checkCollision, 10); 
 }
-
 
 // --- EVENT LISTENERS ---
 startButton.addEventListener('click', startGame);
