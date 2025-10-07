@@ -33,31 +33,65 @@ const MAX_JUMP_HEIGHT_BOOST = 130;
 
 
 //machine learning(attempt)
+// REPLACE your existing setupWebcamAndML() function with this:
 async function setupWebcamAndML() {
     // 1. Setup Video Element (hidden or background)
     videoElement = document.createElement('video');
     videoElement.width = VIDEO_WIDTH;
     videoElement.height = VIDEO_HEIGHT;
     videoElement.autoplay = true;
-    videoElement.style.display = 'none'; // Keep the video stream hidden
+    
+    // IMPORTANT: Temporarily append the video element to the body 
+    // to ensure the browser registers it as part of the document.
+    document.body.appendChild(videoElement);
+    videoElement.style.display = 'none'; 
 
-    // 2. Load the Hand Pose Detection Model
-    const model = handPoseDetection.SupportedModels.MediaPipeHands;
-    const detectorConfig = {
-        runtime: 'mediapipe', // Use the optimized Mediapipe backend
-        modelType: 'full'
-    };
-    detector = await handPoseDetection.createDetector(model, detectorConfig);
+    try {
+        // 2. Load the Hand Pose Detection Model
+        const model = handPoseDetection.SupportedModels.MediaPipeHands;
+        const detectorConfig = {
+            runtime: 'mediapipe', // Use the optimized Mediapipe backend
+            modelType: 'full'
+        };
+        // This is a time-consuming step; it may cause a delay.
+        detector = await handPoseDetection.createDetector(model, detectorConfig);
 
-    // 3. Start Webcam Stream
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoElement.srcObject = stream;
-    await new Promise((resolve) => {
-        videoElement.onloadedmetadata = resolve;
-    });
+        // 3. Start Webcam Stream - This is where the permission prompt happens
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+        
+        await new Promise((resolve) => {
+            videoElement.onloadedmetadata = resolve;
+        });
 
-    // 4. Start the detection loop
-    detectHandsLoop();
+        // 4. Start the detection loop
+        detectHandsLoop();
+        
+    } catch (error) {
+        // --- CRITICAL ERROR LOGGING ---
+        console.error("Webcam or ML Setup Failed:", error);
+
+        // Alert the user with a clearer message
+        let errorMessage = "Webcam access failed! Please check:";
+        if (error.name === "NotAllowedError") {
+            errorMessage += "\n1. Did you deny camera permission?";
+            errorMessage += "\n2. Did you accidentally block it for this site?";
+        } else if (error.name === "NotFoundError") {
+            errorMessage += "\n1. Is your camera connected and working?";
+        } else {
+            errorMessage += "\n1. Is your browser blocking the camera (check the URL bar)?";
+            errorMessage += "\n2. Are you running from http://localhost:8000?";
+        }
+        
+        // This alert helps the user debug without opening the console
+        alert(errorMessage); 
+        
+        // Disable ML control fallback:
+        // You might want to re-enable your keyboard/click jump listeners here if it fails
+        
+        // Return to prevent the detection loop from starting
+        return; 
+    }
 }
 
 //machine learning (attempt)
