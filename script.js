@@ -10,8 +10,7 @@ const highScoreDisplay = document.getElementById('high-score');
 const howToPlayBtn = document.getElementById('how-to-play-button');
 const instructions = document.getElementById('instructions');
 const closeBtn = document.getElementById('close-instructions');
-// You defined returnHomeButton twice in your CSS, but here is the JS reference:
-const returnHomeButton = document.getElementById('return-home-button'); 
+const returnHomeButton = document.getElementById('return-home-button');
 
 let isJumping = false;
 let score = 0;
@@ -22,22 +21,16 @@ let obstacleSpawnInterval;
 let frameToggle = true;
 let randomMixSequence = 0; 
 
-// REMOVED UNUSED/UNDEFINED ML VARIABLES:
-// let detector;
-// let videoElement;
-// const VIDEO_WIDTH = 640;
-// const VIDEO_HEIGHT = 480;
-
 let highScore = 0;
 let currentStage = 1;      
 let stageScoreCounter = 0; 
 
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
-const MAX_JUMP_HEIGHT_BOOST = 150; // Used for Stage 2+
+const MAX_JUMP_HEIGHT_BOOST = 150; 
 
 
-// --- HIGH SCORE LOGIC (No changes needed) ---
+// --- HIGH SCORE LOGIC ---
 function loadHighScore() {
     const storedHighScore = localStorage.getItem('pawmpkinHighScore');
     if (storedHighScore) {
@@ -46,7 +39,7 @@ function loadHighScore() {
     highScoreDisplay.textContent = `High Score: ${highScore}`;
 }
 
-// --- CAT RUNNING ANIMATION LOGIC (No changes needed) ---
+// --- CAT RUNNING ANIMATION LOGIC ---
 function animateCatRun() {
     if (!isGameOver) {
         if (frameToggle) {
@@ -58,32 +51,30 @@ function animateCatRun() {
     }
 }
 
-// --- DYNAMIC OBSTACLE CREATION & SCORING LOGIC (Minor cleanup) ---
+// --- DYNAMIC OBSTACLE CREATION & SCORING LOGIC ---
 function createObstacle(className, width, height, bottom, imageURL) {
     const newObstacle = document.createElement('div');
-    // Ensure both general .obstacle and specific class are added
     newObstacle.classList.add('obstacle', className); 
     
     newObstacle.style.width = `${width}px`;
     newObstacle.style.height = `${height}px`;
     newObstacle.style.bottom = `${bottom}px`; 
     newObstacle.style.backgroundImage = `url('images/${imageURL}')`;
-    // CRITICAL: Set animation-duration dynamically based on stage/difficulty if you want the game to speed up.
-    newObstacle.style.animation = 'obstacleMove 2s linear forwards'; // Added 'forwards' for cleaner stop
+    newObstacle.style.animation = 'obstacleMove 2s linear forwards'; // Added 'forwards'
     
     gameContainer.appendChild(newObstacle);
 
-    // Scoring and Removal Logic (Your logic here is correct)
+    // Scoring and Removal Logic
     setTimeout(() => {
         if (!isGameOver) { 
             score++;
             stageScoreCounter++; 
             scoreDisplay.textContent = `Score: ${score}`;
 
+            // Check for stage advancement immediately after scoring
             if (stageScoreCounter >= 5) {
                 currentStage++;
                 stageScoreCounter = 0;
-                // Limit stages to 5
                 if (currentStage > 5) {
                     currentStage = 5; 
                 }
@@ -111,27 +102,18 @@ function createTriplePumpkin() {
 // Stage 4: Ghost (floats high)
 function createGhost() {
     const GHOST_HEIGHT = 64;
-    const GHOST_BOTTOM = 60; // Floats 60px above ground
+    const GHOST_BOTTOM = 60; 
     
     createObstacle('ghost', 64, GHOST_HEIGHT, GHOST_BOTTOM, 'FGhost.png');
 }
 
-// --- SPAWN LOOP (FIXED STAGE ASSIGNMENTS) ---
+// --- SPAWN LOOP (Revised Stage Logic) ---
 function spawnLoop() {
-    // You can adjust the speed dynamically here:
-    // const minTime = 2500 - (currentStage * 100); 
-    // const maxTime = 1200 - (currentStage * 50);
     const randomTime = Math.random() * (2500 - 1200) + 1200;
     
     obstacleSpawnInterval = setTimeout(() => {
         
         let obstacleCreator;
-        
-        // CRITICAL FIX: The stage numbers were out of sync with your stage progression intent.
-        // Stage 1: Singular (Only 1)
-        // Stage 2: Singular/Double
-        // Stage 3: Singular/Double/Triple
-        // Stage 4: Add Ghost to the mix
         
         if (currentStage === 1) {
             obstacleCreator = createSingularPumpkin;
@@ -141,17 +123,14 @@ function spawnLoop() {
         } else if (currentStage === 3) {
             const creators = [createSingularPumpkin, createDoublePumpkin, createTriplePumpkin];
             obstacleCreator = creators[Math.floor(Math.random() * creators.length)];
-        } else { // Stage 4 and 5 (Final Mix)
-            // Sequential Mix (Ghost after every 2 pumpkins)
+        } else { // Stage 4 and 5 (Final Mix with Ghost)
             if (randomMixSequence >= 2) {
-                // 1. Ghost spawns on the 3rd turn
                 obstacleCreator = createGhost;
-                randomMixSequence = 0; // Reset counter
+                randomMixSequence = 0;
             } else {
-                // 2. Random Pumpkin spawns on the 1st and 2nd turns
                 const creators = [createSingularPumpkin, createDoublePumpkin, createTriplePumpkin];
                 obstacleCreator = creators[Math.floor(Math.random() * creators.length)];
-                randomMixSequence++; // Increment counter (to 1 or 2)
+                randomMixSequence++;
             }
         }
 
@@ -163,7 +142,8 @@ function spawnLoop() {
     }, randomTime);
 }
 
-// --- JUMP LOGIC (No changes needed, logic is correct for jump boost) ---
+
+// --- JUMP LOGIC ---
 function jump() {
     if (isJumping || isGameOver) {
         return; 
@@ -174,7 +154,6 @@ function jump() {
     
     let maxJumpHeight = (currentStage >= 4) ? MAX_JUMP_HEIGHT_BOOST : MAX_JUMP_HEIGHT; 
     
-    // Use requestAnimationFrame for smoother jump animation (Optional)
     let upInterval = setInterval(() => {
         if (position >= (GROUND_HEIGHT + maxJumpHeight)) { 
             clearInterval(upInterval);
@@ -197,7 +176,7 @@ function jump() {
 }
 
 
-// --- COLLISION CHECK LOGIC (No changes needed, the logic is very detailed and correct) ---
+// --- COLLISION CHECK LOGIC ---
 function checkCollision() {
     if (isGameOver) return;
     
@@ -248,7 +227,7 @@ function checkCollision() {
 }
 
 
-// --- GAME OVER LOGIC (No changes needed) ---
+// --- GAME OVER LOGIC ---
 function gameOver() {
     isGameOver = true;
     
@@ -271,7 +250,7 @@ function gameOver() {
     gameOverScreen.style.display = 'flex'; 
 }
 
-// --- GAME RESET LOGIC (Added cleanup to ensure menu is hidden and screens are set correctly) ---
+// --- GAME RESET LOGIC ---
 function resetGame() {
     document.querySelectorAll('.obstacle').forEach(obstacle => {
         obstacle.remove();
@@ -286,7 +265,6 @@ function resetGame() {
     isJumping = false;
     cat.style.bottom = `${GROUND_HEIGHT}px`; 
     
-    // Ensure both screens are correctly hidden/shown for the start state
     gameOverScreen.style.display = 'none';
     startMenu.style.display = 'flex'; 
     
@@ -303,8 +281,7 @@ function startGame() {
     cat.style.visibility = 'visible';
     scoreDisplay.style.visibility = 'visible';
 
-    // CRITICAL FIX: COMMENTED OUT UNDEFINED FUNCTION
-    // setupWebcamAndML(); 
+    // REMOVED: setupWebcamAndML() call (as it was undefined)
 
     gameContainer.focus(); 
 
@@ -314,27 +291,25 @@ function startGame() {
     gameLoopInterval = setInterval(checkCollision, 10); 
 }
 
-// --- EVENT LISTENERS (Minor cleanup) ---
+// --- EVENT LISTENERS ---
 startButton.addEventListener('click', startGame);
 
 playAgainButton.addEventListener('click', () => {
-    // Correct way to restart after game over
     resetGame();
     startGame();
 });
 
 howToPlayBtn.addEventListener('click', () => {
     instructions.style.display = 'block';
-  });
-  
-  closeBtn.addEventListener('click', () => {
+});
+
+closeBtn.addEventListener('click', () => {
     instructions.style.display = 'none';
-  });
+});
   
-  returnHomeButton.addEventListener('click', () => {
-    // Use resetGame to clean up game state AND show the start menu
-    resetGame(); 
-  });
+returnHomeButton.addEventListener('click', () => {
+    resetGame();
+});
 
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' && !isGameOver) {
@@ -342,25 +317,27 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Listener for desktop clicks
 gameContainer.addEventListener('click', () => {
     if (!isGameOver) {
         jump();
     }
 });
 
+// **CRITICAL MOBILE FIX:** Added { passive: false } for reliable touch detection
 gameContainer.addEventListener('touchstart', (event) => {
+    // Prevent default browser actions like scrolling/zooming on the game area
     event.preventDefault(); 
     if (!isGameOver) {
         jump();
     }
-});
+}, { passive: false });
 
 
 // --- INITIALIZATION ---
-// Hide screens initially
 gameOverScreen.style.display = 'none';
-cat.style.visibility = 'hidden'; // Hide the cat on startup
-scoreDisplay.style.visibility = 'hidden'; // Hide score on startup
+cat.style.visibility = 'hidden'; 
+scoreDisplay.style.visibility = 'hidden'; 
 
 cat.style.bottom = `${GROUND_HEIGHT}px`;
 loadHighScore();
