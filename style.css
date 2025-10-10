@@ -1,12 +1,14 @@
 #game-container {
-  max-width: 600px; 
+  /* RESPONSIVE SIZING: Use VW but cap at max-width/height */
   width: 90vw;      
-  height: 30vw;    
-  max-height: 200px; 
+  max-width: 600px; 
+  /* Use clamp for height to keep it proportional but avoid extreme values */
+  height: clamp(100px, 40vw, 400px);
+  
   border: 5px solid #8B4513; 
   margin: 20px auto; 
   
-  background-image: url('images/MoonBackground.png');
+  background-image: url('images/mountain-range-9842371_1280.jpg');
   background-size: cover;                       
   background-repeat: no-repeat;
   background-position: center bottom;            
@@ -16,6 +18,7 @@
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
   z-index: 1; 
 }
+
 
 body {
   margin: 0;
@@ -42,8 +45,11 @@ body {
   align-items: center;
   z-index: 10; 
   text-align: center;
-  padding: 20px;
+  padding-bottom: 80px;
+  padding-top: 55px;
+
   box-sizing: border-box;
+  font-family: 'Pixelify Sans', sans-serif; /* Keep font family here */
 }
 
 #start-menu h1 {
@@ -57,10 +63,6 @@ body {
   color: #8B4513;
   margin-top: 0;
   font-size: 1.2em;
-}
-
-#start-menu, #score {
-  font-family: 'Pixelify Sans', sans-serif;
 }
 
 #start-button {
@@ -80,9 +82,43 @@ body {
   background-color: #ff4500;
 }
 
-#cat, #pumpkin, #score {
-  visibility: hidden; 
+#how-to-play-button {
+  padding: 4px 6px;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: white;
+  background-color: #228B22; /* Forest green */
+  border: 3px solid #006400;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Pixelify Sans', sans-serif;
+  transition: background-color 0.2s;
 }
+
+#how-to-play-button:hover {
+  background-color: #006400;
+}
+
+#return-home-button {
+  padding: 5px 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: white;
+  background-color: #ff4500;
+  border: 3px solid #f0e0d0;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+  font-family: 'Pixelify Sans', sans-serif;
+}
+
+#return-home-button:hover {
+  background-color: #ff9900;
+}
+
 
 @keyframes jump-effect {
   0% { transform: scale(1); }
@@ -90,13 +126,15 @@ body {
   100% { transform: scale(1); }
 }
 
+/* RESPONSIVE CAT SIZING */
 #cat {
-  width: 64px; 
-  height: 64px; 
+  width: 15vw; /* Base width set using viewport units */
+  height: 15vw; 
+  max-width: 64px; /* Max size for large screens */
+  max-height: 64px;
   position: absolute;
   bottom: 10px; 
-  left: 20px;
-  
+  left: 50px;  
   background-image: url('images/FCat1.png'); 
   background-size: cover;
   background-color: transparent; 
@@ -104,9 +142,14 @@ body {
   border-radius: 0; 
 }
 
+
+
+/* RESPONSIVE PUMPKIN SIZING */
 #pumpkin {
-  width: 60px; 
-  height: 45px;
+  width: 10vw; 
+  height: 7.5vw;
+  max-width: 45px;
+  max-height: 35px;
   position: absolute;
   bottom: 10px; 
   right: 0; 
@@ -118,6 +161,7 @@ body {
   background-position: bottom;
   background-color: transparent; 
   border-radius: 0;
+  visibility: hidden; /* Default visibility handled by JS */
 }
 
 .running-frame-1 {
@@ -132,7 +176,8 @@ body {
 }
 
 .obstacle {
-  width: 60px; 
+  width: 10vw; 
+  max-width: 60px;
   position: absolute;
   bottom: 10px; 
   right: 0; 
@@ -145,16 +190,42 @@ body {
 }
 
 .obstacle.double-pumpkin {
-  width: 60px;
+  width: 10vw;
+  height: 15vw; 
+  max-height: 90px;
 }
 
 .obstacle.triple-pumpkin {
-  width: 60px;
+  width: 10vw;
+  height: 22.5vw; 
+  max-height: 135px;
 }
 
 .obstacle.ghost {
-  width: 64px;
-  height: 64px;
+  width: 25vw;
+  height: 25vw;
+  max-width: 64px;
+  max-height: 64px;
+}
+
+/* --- ENHANCED SCORE PROMINENCE (Top Center) --- */
+#score {
+  position: absolute; 
+  top: 10px; 
+  left: 50%; 
+  transform: translateX(-50%); /* Centers the element horizontally */
+  
+  color: #FFD700; /* Gold color for prominence */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Shadow for high contrast */
+  background-color: rgba(0, 0, 0, 0.3); /* Subtle background */
+  padding: 5px 10px;
+  border-radius: 5px; 
+  
+  font-size: 1.8em; /* Prominent size on desktop */
+  font-weight: bold; 
+  z-index: 5; 
+  font-family: 'Pixelify Sans', sans-serif;
+  visibility: hidden; /* Default visibility handled by JS */
 }
 
 @keyframes obstacleMove {
@@ -173,29 +244,26 @@ body {
   width: 100%;
   height: 100%;
   
-  display: none; 
-  
-  background-color: rgba(0, 0, 0, 0.85);
-  color: white;
+  display: flex; /* ✅ This is the key addition */
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 10; 
   text-align: center;
-  padding: 20px;
+  
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  z-index: 10; 
+  overflow-y: auto;
+  padding-bottom: 150px;
   font-family: 'Pixelify Sans', monospace;
 }
 
+
+/* Note: The 'display: none' was redundant in h1 and moved to the mobile media query for dynamic scaling */
 #game-over-screen h1 {
   color: #FF4500; 
   margin-bottom: 5px;
   font-size: 3.5em;
-  display: none;
-  
-  flex-direction: column; 
-  justify-content: center;
-  align-items: center;
-  z-index: 10; 
   text-shadow: 3px 3px 5px rgba(255, 255, 255, 0.5);
 }
 
@@ -209,7 +277,6 @@ body {
   font-weight: bold;
   color: #ff9900; 
   margin-bottom: 0.5px;
-
 }
 
 #high-score {
@@ -217,7 +284,7 @@ body {
   font-family: 'Pixelify Sans', sans-serif;
   font-size: 1.5em; 
   margin-top: 10px; 
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Adjusted: Reduced margin-bottom from 20px to 10px globally to pull button up */
 }
 
 #play-again-button {
@@ -229,15 +296,119 @@ body {
   border: 3px solid #ff9900;
   border-radius: 8px;
   cursor: pointer;
-  display: block; 
+  display: inline-block; 
   
-  margin-top: 5px; 
+  margin-top: 10px; 
+  margin-right: 10px; /* Add space between Play Again and new Return Home button */
   
   transition: background-color 0.2s;
-  font-family: 'PawPatchPixel', monospace;
+  font-family: 'Pixelify Sans', sans-serif; /* Corrected font-family reference */
 }
 
 #play-again-button:hover {
   background-color: #ff9900;
   color: white;
+}
+
+/* Style for Return Home Button */
+#return-home-button {
+  padding: 5px 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: white; 
+  background-color: #ff4500; 
+  border: 3px solid #f0e0d0; 
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  
+  margin-top: 10px; 
+  margin-right: 10px;
+  
+  transition: background-color 0.2s;
+  font-family: 'Pixelify Sans', sans-serif;
+}
+
+#return-home-button:hover {
+  background-color: #ff9900;
+}
+
+
+/* --- MOBILE OPTIMIZATION (for narrow screens) --- */
+@media screen and (max-width: 600px) {
+    
+  #game-container {
+      height: 85vh; 
+      max-height: 250px;
+      width: 95vw;
+        pointer-events: auto;
+      
+  }
+  #container {
+    height: 250px; 
+    overflow: visible; 
+  }
+  
+  
+  #score {
+    font-size: 5vw; 
+    top: 5px;
+  }
+
+@media screen and (max-width: 600px) {
+  #game-over-screen h1 {
+    font-size: 8vw;
+  }
+
+  #game-over-screen p {
+    font-size: 4.5vw;
+  }
+
+  #final-score, #high-score {
+    font-size: 6vw;
+  }
+
+  #play-again-button,
+  #return-home-button {
+    font-size: 5vw;
+    padding: 2vw 5vw;
+    margin-top: 3vw;
+  }
+}
+
+  
+  #start-menu h1 {
+      font-size: 8vw; 
+  }
+  
+  #start-menu p {
+      font-size: 4vw;
+  }
+  
+  #instructions p {
+      font-size: 4vw;
+      max-height: 100px; /* or whatever fits */
+      overflow-y: auto;
+  }
+  #instructions {
+    position: absolute;
+    bottom: 60px; /* move it up from the bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 300px;
+    padding: 15px;
+    background: #fff8e1;
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    color: #8B4513;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: none;
+  }
+  
+  
+  #start-button {
+      font-size: 5vw;
+      padding: 1.5vw 3vw;
+  }
 }

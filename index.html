@@ -8,33 +8,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.13.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection@0.0.6/dist/hand-pose-detection.js"></script>
-    <div id="game-container" tabindex="0">
-        
-      <div id="start-menu">
-        <h1>🐾 Paw-mpkin Patch 🎃</h1>
-        <p>A Cat's Autumn Adventure <3 </p>
-        
-        <div id="instructions"></div>
-        
-        
-        <button id="start-button">Play!</button>
-      </div>
 
-      <div id="game-over-screen">
-        <h1>GAME OVER</h1>
-        <p>Your final score:</p>
-        <p id="final-score">0</p>
-        <p id="high-score">High Score: 0</p> 
-        <button id="play-again-button">Play Again?</button>
-    </div>
-      
-      <div id="ground"></div> 
-      <div id="cat"></div>
-      <div id="score">Score: 0</div>
-    </div>
+    <div id="game-container"> 
+        
+        <div id="start-menu">
+            <h1>🐾 Paw-mpkin Patch 🎃</h1>
+            <p>A Cat's Autumn Adventure <3 </p>
+            
+            <button id="start-button">Play!</button>
+            <button id="how-to-play-button">How to Play</button>
+            
+            <div id="instructions" style="
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+            max-width: 300px;
+            text-align: center;
+            color: #8B4513;
+            border: 2px solid #8B4513;
+            border-radius: 12px;
+            padding: 5px;
+            background: #fff8e1;
+            box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+          ">
+            <button id="close-instructions" style="
+              position: absolute;
+              top: 5px;
+              right: 8px;
+              background: transparent;
+              border: none;
+              font-size: 18px;
+              font-weight: bold;
+              color: #8B4513;
+              cursor: pointer;">&times;</button>
+            
+            <p>Help the pumpkin kitty avoid obstacles! Jump to avoid pumpkins and ghosts! Tap or press Spacebar to jump.</p>
+          </div>
+        </div>
+        
+        <div id="game-over-screen">
+            <h1>GAME OVER</h1>
+            <p>Your final score:</p>
+            <p id="final-score">0</p>
+            <p id="high-score">High Score: 0</p> 
+            <button id="play-again-button">Play Again?</button>
+            <button id="return-home-button">Return Home</button>
+        </div>
+
+        <div id="cat"></div>
+        <div id="score">Score: 0</div>
+        </div> 
 
     <script src="script.js"></script>
 </body>
