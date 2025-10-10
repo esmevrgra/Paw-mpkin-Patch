@@ -232,7 +232,7 @@ function spawnLoop() {
             case 4:
             obstacleCreator = createTriplePumpkin;
             break;
-            case 5: // Sequential Mix (Ghost after every 2 pumpkins)
+            case 5: // Sequential Mix (Ghost after every 2 pumpkins) hi
             default:
                 // Check if we've spawned 2 pumpkins already (randomMixSequence will be 2)
                 if (randomMixSequence >= 2) {
