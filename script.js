@@ -7,6 +7,10 @@ const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreDisplay = document.getElementById('final-score');
 const playAgainButton = document.getElementById('play-again-button');
 const highScoreDisplay = document.getElementById('high-score');
+const howToPlayBtn = document.getElementById('how-to-play-button');
+const instructions = document.getElementById('instructions');
+const closeBtn = document.getElementById('close-instructions');
+const returnHomeButton = document.getElementById('return-home-button');
 
 let isJumping = false;
 let score = 0;
@@ -29,7 +33,7 @@ let stageScoreCounter = 0; // Counter for current stage goal (5)
 const GROUND_HEIGHT = 10;
 const MAX_JUMP_HEIGHT = 90;
 // CRITICAL FIX: INCREASED to 130 to safely clear the Ghost's 124px height.
-const MAX_JUMP_HEIGHT_BOOST = 130; 
+const MAX_JUMP_HEIGHT_BOOST = 150;
 
 
 //machine learning(attempt)
@@ -259,6 +263,7 @@ function spawnLoop() {
 
 // --- JUMP LOGIC ---
 function jump() {
+    console.log('Jump triggered');
     if (isJumping || isGameOver) {
         return; 
     }
@@ -432,6 +437,22 @@ playAgainButton.addEventListener('click', () => {
     startGame();
 });
 
+howToPlayBtn.addEventListener('click', () => {
+    instructions.style.display = 'block';
+  });
+  
+  closeBtn.addEventListener('click', () => {
+    instructions.style.display = 'none';
+  });
+  
+
+  
+  returnHomeButton.addEventListener('click', () => {
+    gameOverScreen.style.display = 'none';
+    startMenu.style.display = 'flex';
+    resetGame(); // Reset game state but stay on menu
+  });
+
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' && !isGameOver) {
         jump();
@@ -443,6 +464,15 @@ gameContainer.addEventListener('click', () => {
         jump();
     }
 });
+
+gameContainer.addEventListener('touchstart', (event) => {
+    // Prevent default browser actions like scrolling/zooming on the game area
+    event.preventDefault(); 
+    if (!isGameOver) {
+        jump();
+    }
+});
+
 
 
 // --- INITIALIZATION ---
