@@ -37,6 +37,11 @@
   background: #fff8e1;
   box-shadow: 0 4px 12px rgba(139,69,19,0.3);
 }
+body, #instructions {
+  font-family: 'Pixelify Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 
 
 
