@@ -17,6 +17,8 @@
   overflow: hidden; 
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
   z-index: 1; 
+  
+  
 }
 
 
@@ -411,4 +413,11 @@ body {
       font-size: 5vw;
       padding: 1.5vw 3vw;
   }
+}
+/* --- CRITICAL MOBILE TOUCH FIX: Prevents hidden menus from blocking input --- */
+.hidden-screen {
+  /* CRITICAL: This is the property that stops the element from intercepting touches/clicks. */
+  pointer-events: none !important; 
+  /* Ensures the element is visually hidden and doesn't take up any space. */
+  display: none !important;
 }
